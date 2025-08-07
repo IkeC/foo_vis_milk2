@@ -363,8 +363,8 @@ int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance
 {
     // PROTECTED CONFIG PANEL SETTINGS (also see 'private' settings, below)
     m_start_fullscreen = 0;
-    m_max_fps_fs = 30;
-    m_max_fps_w = 30;
+    m_max_fps_fs = 60;
+    m_max_fps_w = 60;
     m_show_press_f1_msg = 1;
     m_allow_page_tearing_w = 0;
     m_allow_page_tearing_fs = 0;
@@ -377,8 +377,9 @@ int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance
     m_enable_hdr = 0;
     m_enable_downmix = 0;
     m_show_album = 0;
-    m_back_buffer_format = DXGI_FORMAT_UNKNOWN;
-    m_depth_buffer_format = DXGI_FORMAT_UNKNOWN;
+    m_back_buffer_format = DXGI_FORMAT_B8G8R8A8_UNORM; //DXGI_FORMAT_UNKNOWN;
+    m_depth_buffer_format = DXGI_FORMAT_D32_FLOAT;
+     //DXGI_FORMAT_UNKNOWN;
     m_back_buffer_count = 2;
     m_min_feature_level = D3D_FEATURE_LEVEL_9_1;
 
@@ -594,11 +595,11 @@ wchar_t* BuildSettingName(const wchar_t* name, const int number)
 void CPluginShell::ReadFont(const int n)
 {
 #ifndef _FOOBAR
-    GetPrivateProfileString(L"settings", BuildSettingName(L"szFontFace", n), m_fontinfo[n].szFace, m_fontinfo[n].szFace, ARRAYSIZE(m_fontinfo[n].szFace), m_szConfigIniFile);
-    m_fontinfo[n].nSize = GetPrivateProfileInt(L"settings", BuildSettingName(L"nFontSize", n), m_fontinfo[n].nSize, m_szConfigIniFile);
-    m_fontinfo[n].bBold = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontBold", n), m_fontinfo[n].bBold, m_szConfigIniFile);
-    m_fontinfo[n].bItalic = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontItalic", n), m_fontinfo[n].bItalic, m_szConfigIniFile);
-    m_fontinfo[n].bAntiAliased = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontAA", n), m_fontinfo[n].bItalic, m_szConfigIniFile);
+    //GetPrivateProfileString(L"settings", BuildSettingName(L"szFontFace", n), m_fontinfo[n].szFace, m_fontinfo[n].szFace, ARRAYSIZE(m_fontinfo[n].szFace), m_szConfigIniFile);
+    //m_fontinfo[n].nSize = GetPrivateProfileInt(L"settings", BuildSettingName(L"nFontSize", n), m_fontinfo[n].nSize, m_szConfigIniFile);
+    //m_fontinfo[n].bBold = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontBold", n), m_fontinfo[n].bBold, m_szConfigIniFile);
+    //m_fontinfo[n].bItalic = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontItalic", n), m_fontinfo[n].bItalic, m_szConfigIniFile);
+    //m_fontinfo[n].bAntiAliased = GetPrivateProfileInt(L"settings", BuildSettingName(L"bFontAA", n), m_fontinfo[n].bItalic, m_szConfigIniFile);
 #else
     UNREFERENCED_PARAMETER(n);
 #endif
@@ -617,18 +618,18 @@ void CPluginShell::ReadConfig()
         return;
 
     m_multisample_fs = {static_cast<UINT>(GetPrivateProfileInt(L"settings", L"multisample_fullscreen", m_multisample_fs.Count, m_szConfigIniFile)), 0u};
-    m_multisample_d = {static_cast<UINT>(GetPrivateProfileInt(L"settings", L"multisample_desktop", m_multisample_d.Count, m_szConfigIniFile)), 0u};
+    //m_multisample_d = {static_cast<UINT>(GetPrivateProfileInt(L"settings", L"multisample_desktop", m_multisample_d.Count, m_szConfigIniFile)), 0u};
     m_multisample_w = {static_cast<UINT>(GetPrivateProfileInt(L"settings", L"multisample_windowed", m_multisample_w.Count, m_szConfigIniFile)), 0u};
 
     char str[256];
-    GetPrivateProfileStringA("settings", "adapter_guid_fullscreen", "", str, sizeof(str), m_szConfigIniFileA);
+    //GetPrivateProfileStringA("settings", "adapter_guid_fullscreen", "", str, sizeof(str), m_szConfigIniFileA);
     TextToLuidA(str, &m_adapter_guid_fs);
-    GetPrivateProfileStringA("settings", "adapter_guid_desktop", "", str, sizeof(str), m_szConfigIniFileA);
-    TextToLuidA(str, &m_adapter_guid_d);
-    GetPrivateProfileStringA("settings", "adapter_guid_windowed", "", str, sizeof(str), m_szConfigIniFileA);
+    //GetPrivateProfileStringA("settings", "adapter_guid_desktop", "", str, sizeof(str), m_szConfigIniFileA);
+    //TextToLuidA(str, &m_adapter_guid_d);
+    //GetPrivateProfileStringA("settings", "adapter_guid_windowed", "", str, sizeof(str), m_szConfigIniFileA);
     TextToLuidA(str, &m_adapter_guid_w);
     GetPrivateProfileString(L"settings", L"adapter_devicename_fullscreen", L"", m_adapter_devicename_fs, ARRAYSIZE(m_adapter_devicename_fs), m_szConfigIniFile);
-    GetPrivateProfileString(L"settings", L"adapter_devicename_desktop", L"", m_adapter_devicename_d, ARRAYSIZE(m_adapter_devicename_d), m_szConfigIniFile);
+    //GetPrivateProfileString(L"settings", L"adapter_devicename_desktop", L"", m_adapter_devicename_d, ARRAYSIZE(m_adapter_devicename_d), m_szConfigIniFile);
     GetPrivateProfileString(L"settings", L"adapter_devicename_windowed", L"", m_adapter_devicename_w, ARRAYSIZE(m_adapter_devicename_w), m_szConfigIniFile);
 
     // FONTS
@@ -653,32 +654,32 @@ void CPluginShell::ReadConfig()
 #endif
 
     m_start_fullscreen = GetPrivateProfileInt(L"settings", L"start_fullscreen", m_start_fullscreen, m_szConfigIniFile);
-    m_start_desktop = GetPrivateProfileInt(L"settings", L"start_desktop", m_start_desktop, m_szConfigIniFile);
-    m_fake_fullscreen_mode = GetPrivateProfileInt(L"settings", L"fake_fullscreen_mode", m_fake_fullscreen_mode, m_szConfigIniFile);
+    //m_start_desktop = GetPrivateProfileInt(L"settings", L"start_desktop", m_start_desktop, m_szConfigIniFile);
+    //m_fake_fullscreen_mode = GetPrivateProfileInt(L"settings", L"fake_fullscreen_mode", m_fake_fullscreen_mode, m_szConfigIniFile);
     m_max_fps_fs = GetPrivateProfileInt(L"settings", L"max_fps_fs", m_max_fps_fs, m_szConfigIniFile);
-    m_max_fps_d = GetPrivateProfileInt(L"settings", L"max_fps_dm", m_max_fps_d, m_szConfigIniFile);
-    m_max_fps_w = GetPrivateProfileInt(L"settings", L"max_fps_w", m_max_fps_w, m_szConfigIniFile);
+    //m_max_fps_d = GetPrivateProfileInt(L"settings", L"max_fps_dm", m_max_fps_d, m_szConfigIniFile);
+    //m_max_fps_w = GetPrivateProfileInt(L"settings", L"max_fps_w", m_max_fps_w, m_szConfigIniFile);
     m_show_press_f1_msg = GetPrivateProfileInt(L"settings", L"show_press_f1_msg", m_show_press_f1_msg, m_szConfigIniFile);
     m_allow_page_tearing_w = GetPrivateProfileInt(L"settings", L"allow_page_tearing_w", m_allow_page_tearing_w, m_szConfigIniFile);
     m_allow_page_tearing_fs = GetPrivateProfileInt(L"settings", L"allow_page_tearing_fs", m_allow_page_tearing_fs, m_szConfigIniFile);
-    m_allow_page_tearing_d = GetPrivateProfileInt(L"settings", L"allow_page_tearing_dm", m_allow_page_tearing_d, m_szConfigIniFile);
+    //m_allow_page_tearing_d = GetPrivateProfileInt(L"settings", L"allow_page_tearing_dm", m_allow_page_tearing_d, m_szConfigIniFile);
     m_minimize_winamp = GetPrivateProfileInt(L"settings", L"minimize_winamp", m_minimize_winamp, m_szConfigIniFile);
-    m_desktop_show_icons = GetPrivateProfileInt(L"settings", L"desktop_show_icons", m_desktop_show_icons, m_szConfigIniFile);
-    m_desktop_textlabel_boxes = GetPrivateProfileInt(L"settings", L"desktop_textlabel_boxes", m_desktop_textlabel_boxes, m_szConfigIniFile);
-    m_desktop_manual_icon_scoot = GetPrivateProfileInt(L"settings", L"desktop_manual_icon_scoot", m_desktop_manual_icon_scoot, m_szConfigIniFile);
-    m_desktop_555_fix = GetPrivateProfileInt(L"settings", L"desktop_555_fix", m_desktop_555_fix, m_szConfigIniFile);
+    //m_desktop_show_icons = GetPrivateProfileInt(L"settings", L"desktop_show_icons", m_desktop_show_icons, m_szConfigIniFile);
+    //m_desktop_textlabel_boxes = GetPrivateProfileInt(L"settings", L"desktop_textlabel_boxes", m_desktop_textlabel_boxes, m_szConfigIniFile);
+    //m_desktop_manual_icon_scoot = GetPrivateProfileInt(L"settings", L"desktop_manual_icon_scoot", m_desktop_manual_icon_scoot, m_szConfigIniFile);
+    //m_desktop_555_fix = GetPrivateProfileInt(L"settings", L"desktop_555_fix", m_desktop_555_fix, m_szConfigIniFile);
     m_dualhead_horz = GetPrivateProfileInt(L"settings", L"dualhead_horz", m_dualhead_horz, m_szConfigIniFile);
     m_dualhead_vert = GetPrivateProfileInt(L"settings", L"dualhead_vert", m_dualhead_vert, m_szConfigIniFile);
     m_save_cpu = GetPrivateProfileInt(L"settings", L"save_cpu", m_save_cpu, m_szConfigIniFile);
     m_skin = GetPrivateProfileInt(L"settings", L"skin", m_skin, m_szConfigIniFile);
     m_fix_slow_text = GetPrivateProfileInt(L"settings", L"fix_slow_text", m_fix_slow_text, m_szConfigIniFile);
-    m_vj_mode = GetPrivateProfileBoolW(L"settings", L"vj_mode", m_vj_mode, m_szConfigIniFile);
+    //m_vj_mode = GetPrivateProfileBoolW(L"settings", L"vj_mode", m_vj_mode, m_szConfigIniFile);
 
-    m_disp_mode_fs.Width = GetPrivateProfileInt(L"settings", L"disp_mode_fs_w", m_disp_mode_fs.Width, m_szConfigIniFile);
-    m_disp_mode_fs.Height = GetPrivateProfileInt(L"settings", L"disp_mode_fs_h", m_disp_mode_fs.Height, m_szConfigIniFile);
-    GetPrivateProfileStringA("settings", "disp_mode_fs_r", "60000/1000", str, sizeof(str), m_szConfigIniFileA);
-    sscanf_s(str, "%d/%d", &m_disp_mode_fs.RefreshRate.Numerator, &m_disp_mode_fs.RefreshRate.Denominator);
-    m_disp_mode_fs.Format = static_cast<DXGI_FORMAT>(GetPrivateProfileInt(L"settings", L"disp_mode_fs_f", m_disp_mode_fs.Format, m_szConfigIniFile));
+    //m_disp_mode_fs.Width = GetPrivateProfileInt(L"settings", L"disp_mode_fs_w", m_disp_mode_fs.Width, m_szConfigIniFile);
+    //m_disp_mode_fs.Height = GetPrivateProfileInt(L"settings", L"disp_mode_fs_h", m_disp_mode_fs.Height, m_szConfigIniFile);
+    //GetPrivateProfileStringA("settings", "disp_mode_fs_r", "60000/1000", str, sizeof(str), m_szConfigIniFileA);
+    //sscanf_s(str, "%d/%d", &m_disp_mode_fs.RefreshRate.Numerator, &m_disp_mode_fs.RefreshRate.Denominator);
+    //m_disp_mode_fs.Format = static_cast<DXGI_FORMAT>(GetPrivateProfileInt(L"settings", L"disp_mode_fs_f", m_disp_mode_fs.Format, m_szConfigIniFile));
 
     // Note: Do not call CPlugin's `Preinit()` and `ReadConfig()` until
     //       CPluginShell's `PreInit()` (and `ReadConfig()`) finish.
@@ -688,30 +689,30 @@ void CPluginShell::ReadConfig()
 void CPluginShell::WriteFont(const int /*n*/)
 {
 #ifndef _FOOBAR
-    WritePrivateProfileString(L"settings", BuildSettingName(L"szFontFace", n), m_fontinfo[n].szFace, m_szConfigIniFile);
-    WritePrivateProfileIntW(m_fontinfo[n].bBold, BuildSettingName(L"bFontBold", n), m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_fontinfo[n].bItalic, BuildSettingName(L"bFontItalic", n), m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_fontinfo[n].nSize, BuildSettingName(L"nFontSize", n), m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_fontinfo[n].bAntiAliased, BuildSettingName(L"bFontAA", n), m_szConfigIniFile, L"settings");
+    //WritePrivateProfileString(L"settings", BuildSettingName(L"szFontFace", n), m_fontinfo[n].szFace, m_szConfigIniFile);
+    //WritePrivateProfileIntW(m_fontinfo[n].bBold, BuildSettingName(L"bFontBold", n), m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_fontinfo[n].bItalic, BuildSettingName(L"bFontItalic", n), m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_fontinfo[n].nSize, BuildSettingName(L"nFontSize", n), m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_fontinfo[n].bAntiAliased, BuildSettingName(L"bFontAA", n), m_szConfigIniFile, L"settings");
 #endif
 }
 
 void CPluginShell::WriteConfig()
 {
 #ifndef _FOOBAR
-    WritePrivateProfileIntW(m_multisample_fs.Count, L"multisample_fullscreen", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_multisample_d.Count, L"multisample_desktop", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_multisample_windowed.Count, L"multisample_windowed", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_multisample_fs.Count, L"multisample_fullscreen", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_multisample_d.Count, L"multisample_desktop", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_multisample_windowed.Count, L"multisample_windowed", m_szConfigIniFile, L"settings");
 
     char str[256];
     LuidToTextA(&m_adapter_guid_fs, str, sizeof(str));
-    WritePrivateProfileStringA("settings", "adapter_guid_fullscreen", str, m_szConfigIniFileA);
-    LuidToTextA(&m_adapter_guid_d, str, sizeof(str));
-    WritePrivateProfileStringA("settings", "adapter_guid_desktop", str, m_szConfigIniFileA);
+    //WritePrivateProfileStringA("settings", "adapter_guid_fullscreen", str, m_szConfigIniFileA);
+    //LuidToTextA(&m_adapter_guid_d, str, sizeof(str));
+    //WritePrivateProfileStringA("settings", "adapter_guid_desktop", str, m_szConfigIniFileA);
     LuidToTextA(&m_adapter_guid_w, str, sizeof(str));
-    WritePrivateProfileStringA("settings", "adapter_guid_windowed", str, m_szConfigIniFileA);
+    //WritePrivateProfileStringA("settings", "adapter_guid_windowed", str, m_szConfigIniFileA);
     WritePrivateProfileString(L"settings", L"adapter_devicename_fullscreen", m_adapter_devicename_fs, m_szConfigIniFile);
-    WritePrivateProfileString(L"settings", L"adapter_devicename_desktop", m_adapter_devicename_d, m_szConfigIniFile);
+    //WritePrivateProfileString(L"settings", L"adapter_devicename_desktop", m_adapter_devicename_d, m_szConfigIniFile);
     WritePrivateProfileString(L"settings", L"adapter_devicename_windowed", m_adapter_devicename_w, m_szConfigIniFile);
 
     // FONTS
@@ -735,39 +736,39 @@ void CPluginShell::WriteConfig()
     WriteFont(8);
 #endif
 
-    WritePrivateProfileIntW(m_start_fullscreen, L"start_fullscreen", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_start_desktop, L"start_desktop", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_fake_fullscreen_mode, L"fake_fullscreen_mode", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_max_fps_fs, L"max_fps_fs", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_max_fps_d, L"max_fps_dm", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_max_fps_w, L"max_fps_w", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_show_press_f1_msg, L"show_press_f1_msg", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_allow_page_tearing_w, L"allow_page_tearing_w", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_allow_page_tearing_fs, L"allow_page_tearing_fs", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_allow_page_tearing_d, L"allow_page_tearing_dm", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_minimize_winamp, L"minimize_winamp", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_desktop_show_icons, L"desktop_show_icons", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_desktop_textlabel_boxes, L"desktop_textlabel_boxes", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_desktop_manual_icon_scoot, L"desktop_manual_icon_scoot", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_desktop_555_fix, L"desktop_555_fix", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_dualhead_horz, L"dualhead_horz", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_dualhead_vert, L"dualhead_vert", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_save_cpu, L"save_cpu", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_skin, L"skin", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_fix_slow_text, L"fix_slow_text", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_vj_mode, L"vj_mode", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_start_fullscreen, L"start_fullscreen", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_start_desktop, L"start_desktop", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_fake_fullscreen_mode, L"fake_fullscreen_mode", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_max_fps_fs, L"max_fps_fs", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_max_fps_d, L"max_fps_dm", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_max_fps_w, L"max_fps_w", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_show_press_f1_msg, L"show_press_f1_msg", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_allow_page_tearing_w, L"allow_page_tearing_w", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_allow_page_tearing_fs, L"allow_page_tearing_fs", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_allow_page_tearing_d, L"allow_page_tearing_dm", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_minimize_winamp, L"minimize_winamp", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_desktop_show_icons, L"desktop_show_icons", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_desktop_textlabel_boxes, L"desktop_textlabel_boxes", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_desktop_manual_icon_scoot, L"desktop_manual_icon_scoot", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_desktop_555_fix, L"desktop_555_fix", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_dualhead_horz, L"dualhead_horz", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_dualhead_vert, L"dualhead_vert", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_save_cpu, L"save_cpu", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_skin, L"skin", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_fix_slow_text, L"fix_slow_text", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_vj_mode, L"vj_mode", m_szConfigIniFile, L"settings");
 
-    WritePrivateProfileIntW(m_disp_mode_fs.Width, L"disp_mode_fs_w", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(m_disp_mode_fs.Height, L"disp_mode_fs_h", m_szConfigIniFile, L"settings");
-    sprintf_s(str, "%d/%d", m_disp_mode_fs.RefreshRate.Numerator, m_disp_mode_fs.RefreshRate.Denominator);
-    WritePrivateProfileStringA("settings", "disp_mode_fs_r", str, m_szConfigIniFileA);
-    WritePrivateProfileIntW(m_disp_mode_fs.Format, L"disp_mode_fs_f", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_disp_mode_fs.Width, L"disp_mode_fs_w", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(m_disp_mode_fs.Height, L"disp_mode_fs_h", m_szConfigIniFile, L"settings");
+    //sprintf_s(str, "%d/%d", m_disp_mode_fs.RefreshRate.Numerator, m_disp_mode_fs.RefreshRate.Denominator);
+    //WritePrivateProfileStringA("settings", "disp_mode_fs_r", str, m_szConfigIniFileA);
+    //WritePrivateProfileIntW(m_disp_mode_fs.Format, L"disp_mode_fs_f", m_szConfigIniFile, L"settings");
 
-    WritePrivateProfileIntW(INT_VERSION, L"version", m_szConfigIniFile, L"settings");
-    WritePrivateProfileIntW(INT_SUBVERSION, L"subversion", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(INT_VERSION, L"version", m_szConfigIniFile, L"settings");
+    //WritePrivateProfileIntW(INT_SUBVERSION, L"subversion", m_szConfigIniFile, L"settings");
 
-    // Finally, save the plugin's unique settings.
-    MilkDropWriteConfig();
+    //// Finally, save the plugin's unique settings.
+    //MilkDropWriteConfig();
 #endif
 }
 
@@ -872,6 +873,8 @@ void CPluginShell::EnforceMaxFPS()
         case WINDOWED:   max_fps = m_max_fps_w;  break;
         case FULLSCREEN: max_fps = m_max_fps_fs; break;
     }
+
+    max_fps = 144;
 
     if (max_fps <= 0)
         return;

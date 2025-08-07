@@ -86,6 +86,9 @@
     <ClInclude Include="..\external\winamp\wa_ipc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\external\projectm-eval\ns-eel2-shim\ns-eel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="constanttable.cpp">

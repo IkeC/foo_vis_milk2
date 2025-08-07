@@ -432,7 +432,7 @@ void CTextManager::Init(DXContext* lpDX
     m_d2dDevice = m_lpDX->GetD2DDevice();
     m_d2dContext = m_lpDX->GetD2DDeviceContext();
 #ifndef _FOOBAR
-    m_lpTextSurface = lpTextSurface;
+    //m_lpTextSurface = lpTextSurface;
     m_blit_additively = bAdditive;
 #endif
 

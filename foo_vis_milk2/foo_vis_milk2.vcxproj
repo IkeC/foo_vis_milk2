@@ -852,9 +852,6 @@
     <ProjectReference Include="..\external\pfc\pfc.vcxproj">
       <Project>{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\external\projectm-eval\projectM_eval.vcxproj">
-      <Project>{F253510D-65FC-3877-81E2-034A20BE722D}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\vis_milk2\vis_milk2.vcxproj">
       <Project>{7EE6F699-4EA5-4409-B212-DCFD192C811B}</Project>
     </ProjectReference>

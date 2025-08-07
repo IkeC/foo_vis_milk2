@@ -856,7 +856,7 @@ static void WriteCode(FILE* fOut, const int /* i */, char* pStr, const char* pre
         char ch = pStr[char_pos];
         pStr[char_pos] = 0;
 #ifndef _FOOBAR
-        if (!WritePrivateProfileString(szSectionName, szLineName, &pStr[start_pos], szIniFile)) return false;
+        //if (!WritePrivateProfileString(szSectionName, szLineName, &pStr[start_pos], szIniFile)) return false;
 #endif
         fprintf_s(fOut, "%s=%s%s\n", szLineName, bPrependApostrophe ? "`" : "", &pStr[start_pos]);
         pStr[char_pos] = ch;
@@ -1469,6 +1469,8 @@ bool CState::Import(const wchar_t* szIniFile, float fTime, CState* pOldState, DW
     m_nMaxPSVersion = std::max(m_nWarpPSVersion, m_nCompPSVersion);
     m_nMinPSVersion = std::min(m_nWarpPSVersion, m_nCompPSVersion);
 
+    m_nMinPSVersion = 2;
+    m_nMaxPSVersion = 6;
     RecompileExpressions();
 
     fclose(f);

@@ -992,6 +992,11 @@ int CPlugin::AllocateMilkDropNonDX11()
     g_bThreadShouldQuit = false;
     InitializeCriticalSection(&g_cs);
 
+
+    wchar_t fullPath[MAX_PATH];
+    GetCurrentDirectoryW(MAX_PATH, fullPath);
+
+
     // Read in `m_szShaderIncludeText`.
     // clang-format off
     bool bSuccess = true;
@@ -1124,6 +1129,9 @@ static int GetNearestPow2Size(int w, int h)
 // (...aka OnToggleFullscreen)
 int CPlugin::AllocateMilkDropDX11()
 {
+    m_textures = TexInfoList();
+    //m_errors = ErrorMsgList();
+
     //wchar_t buf[32768], title[64];
 
     m_nFramesSinceResize = 0;
@@ -3053,8 +3061,21 @@ bool CPlugin::LoadShaderFromMemory(const char* szOrigShaderText, const char* szF
     size_t len = strlen(szShaderText);
     int flags = D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     if (S_OK != D3DCompile(szShaderText, len, NULL, NULL, NULL, szFn, szProfile, flags, 0, &pShaderByteCode, &m_pShaderCompileErrors))
+    //if (S_OK != D3DCompile(szShaderText, len, NULL, NULL, NULL, szFn, "ps_5_0", flags, 0, &pShaderByteCode, &m_pShaderCompileErrors))
     {
         failed = true;
+
+        if (m_pShaderCompileErrors)
+        {
+            wchar_t wideErrorMsg[1024];
+            const char* errorMsg = (const char*)m_pShaderCompileErrors->GetBufferPointer();
+            // Convert to wide string
+            MultiByteToWideChar(CP_ACP, 0, errorMsg, -1, wideErrorMsg, _countof(wideErrorMsg));
+            dumpmsg(wideErrorMsg);
+
+            SafeRelease(m_pShaderCompileErrors);
+            //AddNotification(wideErrorMsg);
+        }
     }
 
     if (failed && !strcmp(szProfile, "ps_4_0_level_9_1"))
@@ -3068,6 +3089,18 @@ bool CPlugin::LoadShaderFromMemory(const char* szOrigShaderText, const char* szF
 
     if (failed)
     {
+        if (m_pShaderCompileErrors)
+        {
+          wchar_t wideErrorMsg[1024];  
+          const char* errorMsg = (const char*)m_pShaderCompileErrors->GetBufferPointer();
+            // Convert to wide string
+            MultiByteToWideChar(CP_ACP, 0, errorMsg, -1, wideErrorMsg, _countof(wideErrorMsg));
+            dumpmsg(wideErrorMsg);
+
+            SafeRelease(m_pShaderCompileErrors);
+            //AddNotification(wideErrorMsg);
+        }
+
         /*
         wchar_t temp[1024] = {0};
         swprintf_s(err, WASABI_API_LNGSTRINGW(IDS_ERROR_COMPILING_X_X_SHADER), strcmp(szProfile, "ps_4_0_level_9_1") ? szProfile : "ps_4_0_level_9_3", szWhichShader);
@@ -3123,6 +3156,20 @@ bool CPlugin::LoadShaderFromMemory(const char* szOrigShaderText, const char* szF
     pShaderByteCode->Release();
 
     return true;
+}
+
+
+void CPlugin::dumpmsg(wchar_t* s)
+{
+#if _DEBUG
+    OutputDebugStringW(s);
+    if (s[0])
+    {
+        int len = lstrlenW(s);
+        if (s[len - 1] != L'\n')
+            OutputDebugStringW(L"\n");
+    }
+#endif
 }
 
 // Clean up all the DX11 textures, fonts, buffers, etc...
@@ -3225,7 +3272,9 @@ void CPlugin::CleanUpMilkDropDX11(int /* final_cleanup */)
     SafeRelease(m_lpVS[0]);
     SafeRelease(m_lpVS[1]);
     SafeRelease(m_lpDDSTitle);
-    m_ddsTitle.ReleaseDeviceDependentResources();
+    
+    // m_ddsTitle.ReleaseDeviceDependentResources();
+
 #ifdef _SUPERTEXT
     m_superTitle.reset();
 #endif
@@ -3373,6 +3422,7 @@ void CPlugin::MilkDropRenderFrame(int redraw)
     */
 
     if (!redraw)
+    /*
     {
         GetWinampSongTitle(GetWinampWindow(), m_szSongTitle, ARRAYSIZE(m_szSongTitle));
         if (wcscmp(m_szSongTitle, m_szSongTitlePrev) != 0)
@@ -3382,7 +3432,7 @@ void CPlugin::MilkDropRenderFrame(int redraw)
                 LaunchSongTitleAnim();
         }
     }
-
+    */
     // 2. Clear the background.
     //DWORD clear_color = (m_fog_enabled) ? FOG_COLOR : 0xFF000000;
     //GetDevice()->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_color, 1.0f, 0);
@@ -3589,7 +3639,7 @@ void CPlugin::AddError(wchar_t* szMsg, float fDuration, ErrorCategory category, 
     x.category = category;
     x.bold = bBold;
     x.printed = false;
-    m_errors.push_back(x);
+    //m_errors.push_back(x);
 }
 
 void CPlugin::ClearErrors(int category) // 0 = all categories

@@ -368,11 +368,16 @@ class CPlugin : public CPluginShell
 #define SHADER_BLUR 2
 #define SHADER_OTHER 3
     bool LoadShaderFromMemory(const char* szOrigShaderText, const char* szFn, const char* szProfile, CConstantTable** ppConstTable,
-                              void** ppShader, const int shaderType, const bool bHardErrors);
+                              void** ppShader,
+                              const int shaderType,
+                              const bool bHardErrors);
+    void dumpmsg(wchar_t* s);
     bool RecompileVShader(const char* szShadersText, VShaderInfo* si, int shaderType, bool bHardErrors);
     bool RecompilePShader(const char* szShadersText, PShaderInfo* si, int shaderType, bool bHardErrors, int PSVersion);
     bool EvictSomeTexture();
     typedef std::vector<TexInfo> TexInfoList;
+    // In your header file, ensure this:
+using TexInfoList = std::vector<TexInfo>;
     TexInfoList m_textures;
     bool m_bNeedRescanTexturesDir;
 
